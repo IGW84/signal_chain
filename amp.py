@@ -35,18 +35,24 @@ class Amp:
         s += f'\tCMRR: {self.cmrr} CMRR slope: {self.cmr_slope} Ref Temp: {self.ref_temperature}\n'
         return s
 
-    def output(self, vin):
+    def output(self, vin, cmv=None, temp=None, time=None):
+        if cmv is None:
+            cmv = self.cmv
+        if temp is None:
+            temp = self.temperature
+        if time is None:
+            time = self.time
         # gain
-        gain_error_temp_ppm = (self.temperature - self.ref_temperature) * self.gain_drift_temp
-        gain_error_time_ppm = self.time/1000 * self.gain_drift_time
+        gain_error_temp_ppm = (temp - self.ref_temperature) * self.gain_drift_temp
+        gain_error_time_ppm = time/1000 * self.gain_drift_time
         gain_error_ppm = gain_error_temp_ppm + gain_error_time_ppm
         gain = self.gain * (1 + gain_error_ppm/1e6)
         # offset
-        offset_error_temp_uV = (self.temperature - self.ref_temperature) * self.offset_drift_temp
-        offset_error_time_uV = self.time/1000 * self.offset_drift_time # time drift is given in ppm per 1000 hours
+        offset_error_temp_uV = (temp - self.ref_temperature) * self.offset_drift_temp
+        offset_error_time_uV = time/1000 * self.offset_drift_time # time drift is given in ppm per 1000 hours
         offset = self.offset/1e3 + (offset_error_temp_uV + offset_error_time_uV)/1e6
         #common mode
-        cm_error = self.cmv / 10**(self.cmrr/20)
+        cm_error = cmv / 10**(self.cmrr/20)
         if self.cmr_slope == 'negative':
             cm_error = -cm_error
         return gain*vin + offset + cm_error
@@ -68,7 +74,7 @@ class Amp:
         elif cal_method == 'cm':
             offset = 0.0
             gain = s['gain']
-            cmrr = s['cmrr']
+            cmrr = s['cmrr'] + 10 # assume it improves CMRR by 10 dB
             gain_drift_temp = random.uniform(-s['gain_drift_temp'], s['gain_drift_temp'])
             offset_drift_temp = random.uniform(-s['offset_drift_temp'], s['offset_drift_temp'])
         elif cal_method == 'temperature':
@@ -122,6 +128,8 @@ if __name__ == '__main__':
 
     import pandas as pd
     import matplotlib.pyplot as plt
+    import numpy as np
+
     df = pd.DataFrame()
 
     print(f'{args.cal=}')
@@ -131,6 +139,7 @@ if __name__ == '__main__':
             'offset drift temperature', 'offset drift time','cmv','temperature','time',
             'voltage','output','error']
 
+    slist = []
     run = 0
     total_runs = args.num_runs * len(temp_steps) * len(time_steps) * len(cmv_steps)
     for i in range(args.num_runs):
@@ -145,20 +154,28 @@ if __name__ == '__main__':
                         print(str(run) + '/' + str(total_runs))
                     amp.cmv = cmv
                     for v in vsteps:
-                        out = amp.output(v)
+                        out = amp.output(v, cmv=cmv, temp=temp, time=t)
                         err = (v - out/amp_settings['gain']) * 1000 # error is in mV
-                        data = [run, amp.gain, amp.offset, amp.cmrr, amp.gain_drift_temp, amp.gain_drift_time, amp.offset_drift_temp, amp.offset_drift_time, amp.cmv, amp.temperature, t, v, out, err]
-                        df = df.append(pd.Series(data, cols), ignore_index=True)
+                        data = [
+                            run, amp.gain, amp.offset, amp.cmrr, amp.gain_drift_temp, amp.gain_drift_time,
+                            amp.offset_drift_temp, amp.offset_drift_time, cmv, temp, t, v, out, err,
+                            ]
+                        # df = df.append(pd.Series(data, cols), ignore_index=True)
+                        slist.append(data)
     print(str(run) + '/' + str(total_runs))
+
+    df = pd.DataFrame(slist, columns = cols)
+    xs = np.arange(-3.25, 3.75, 0.5)
     
     print(df)
     vin_to_plot = 2.0
     df2 = df[abs(df['voltage'] - vin_to_plot) < 0.001] # select but with a tolerance
     print(df2[args.col])
-    plt.hist(df2[args.col], align='left')
+    plt.hist(df2[args.col], xs)
 
     plt.xlabel(args.col)  # Todo - pretty up this label and add units
     plt.ylabel('Count')
+    plt.xticks(xs)
     plt.title(f'Distribution @ Vin={vin_to_plot}V')
     plt.show()
 

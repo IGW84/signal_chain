@@ -78,11 +78,15 @@ if __name__ == '__main__':
 
     import pandas as pd
     import matplotlib.pyplot as plt
+    import numpy as np
+
     df = pd.DataFrame()
 
     print(f'{args.cal=}')
 
     temperature = 25
+
+    slist = []
 
     run = 0
     total_runs = args.num_runs * len(time_steps) * len(temp_steps)
@@ -100,14 +104,17 @@ if __name__ == '__main__':
                 v = ref.calc_voltage(temp=temp, time=t)
                 err = (ref_settings['voltage'] - v) * 1000  # error in mV
                 data = [run, ref.voltage, ref.drift_temp, ref.drift_time, temp, t, v, err]
-                df = df.append(pd.Series(data, cols), ignore_index=True)
+                slist.append(data)
+                # df = df.append(pd.Series(data, cols), ignore_index=True)
     print(str(run) + '/' + str(total_runs))
 
-    print(df)
-    plt.hist(df[args.col])
+    df = pd.DataFrame(slist, columns = cols)
+    xs = np.arange(-5.25, 5.25, 0.5)
+    plt.hist(df[args.col], xs)
 
     plt.xlabel(args.col)
     plt.ylabel('Count')
+    plt.xticks(xs)
     plt.title(f'Distribution')
     plt.show()
 

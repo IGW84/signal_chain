@@ -8,6 +8,7 @@ from amp import Amp
 from ref import Reference
 from adc import ADC
 import random
+import numpy as np
 
 def process(amp_settings, ref_settings, adc_settings, cmv_steps, v_steps, temp_steps, time_steps, cal_method='none', num_runs=10):
 
@@ -27,7 +28,7 @@ def process(amp_settings, ref_settings, adc_settings, cmv_steps, v_steps, temp_s
         'System Estimate', 'System Error (mV)', 'Cal Method']
     run = 0
     total_runs = num_runs * len(cmv_steps) * len(time_steps) * len(temp_steps)
-    for i in range(args.num_runs):
+    for i in range(num_runs):
         amp = Amp.new(amp_settings, cal_method)
         ref = Reference.new(ref_settings, cal_method)
         adc = ADC.new(adc_settings, cal_method)
@@ -56,7 +57,7 @@ def process(amp_settings, ref_settings, adc_settings, cmv_steps, v_steps, temp_s
                             ref_settings['voltage'], v_ref, v_ref_err,
                             adc.offset, code_float, code,
                             v_estimate, err,
-                            args.cal,
+                            cal_method,
                         ]
                         slist.append(data) # todo - this is slow and gets slower as df grows. Consider keeping list of pd.Series and making df in one hit
     print(str(run) + '/' + str(total_runs))
@@ -135,10 +136,11 @@ if __name__ == '__main__':
     df = process(amp_settings, ref_settings, adc_settings, cmv_steps, v_steps, temp_steps, time_steps, args.cal, args.num_runs)
 
     print(df)
+    xs = np.arange(-7.25, 7.75, 0.5)
     vin_to_plot = 2.0
     df2 = df[abs(df['Input Voltage'] - vin_to_plot) < 0.001] # select but with a tolerance
     print(df2[args.col])
-    plt.hist(df2[args.col], align='left')
+    plt.hist(df2[args.col], xs)
 
     plt.xlabel(args.col)  # Todo - pretty up this label and add units
     plt.ylabel('Count')
