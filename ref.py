@@ -1,3 +1,6 @@
+
+import random
+
 class Reference:
 
     def __init__(self,
@@ -15,7 +18,7 @@ class Reference:
         self.hysterisis = hysterisis
         self.ref_temperature = ref_temperature
         self.temperature = ref_temperature
-        self.__time = 0
+        self.time = 0
 
     def __repr__(self):
         s = f'name: {self.name}\n'
@@ -28,7 +31,7 @@ class Reference:
         if temp is None:
             temp = self.temperature
         if time is None:
-            time = self.__time
+            time = self.time
         drift_temp_ppm = (temp - self.ref_temperature) * self.drift_temp
         drift_time_ppm = time/1000 * self.drift_time # time drift is given in ppm per 1000 hours
         error_ppm = drift_temp_ppm + drift_time_ppm
@@ -37,10 +40,10 @@ class Reference:
     
     def new(nom_settings, cal_method):
         s = nom_settings
-        if args.cal in ['1point', '2point', 'cm']:
+        if cal_method in ['1point', '2point', 'cm']:
             voltage = s['voltage']
             drift_temp = random.uniform(-s['drift_temp'], s['drift_temp'])
-        elif args.cal == 'temperature':
+        elif cal_method == 'temperature':
             voltage =  s['voltage']
             drift_temp = 0.0
         else:
@@ -73,7 +76,6 @@ if __name__ == '__main__':
     time_steps = [0, 1000]
     temp_steps = [10,25,45]
 
-    import random
     import pandas as pd
     import matplotlib.pyplot as plt
     df = pd.DataFrame()

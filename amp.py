@@ -1,3 +1,6 @@
+
+import random
+
 slope_list = ['negative', 'positive']
 
 class Amp:
@@ -117,7 +120,6 @@ if __name__ == '__main__':
     time_steps = [0, 1000]
     temp_steps = [10,25,45]
 
-    import random
     import pandas as pd
     import matplotlib.pyplot as plt
     df = pd.DataFrame()
