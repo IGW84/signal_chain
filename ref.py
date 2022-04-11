@@ -82,20 +82,25 @@ if __name__ == '__main__':
 
     temperature = 25
 
+    run = 0
+    total_runs = args.num_runs * len(time_steps) * len(temp_steps)
+
+    cols = ['run', 'voltage nominal','drift temperature', 'drift time', 'temperature','time', 'voltage','error']
+    run = 0
     for i in range(args.num_runs):
         ref = Reference.new(ref_settings, args.cal)
-
-        cols = ['run', 'voltage nominal','drift temperature', 'drift time', 'temperature','time', 'voltage','error']
-        run = 0
         for t in time_steps:
             ref.time = t
             for temp in temp_steps:
                 run += 1
+                if run % 10 == 0:
+                    print(str(run) + '/' + str(total_runs))
                 v = ref.calc_voltage(temp=temp, time=t)
                 err = (ref_settings['voltage'] - v) * 1000  # error in mV
                 data = [run, ref.voltage, ref.drift_temp, ref.drift_time, temp, t, v, err]
                 df = df.append(pd.Series(data, cols), ignore_index=True)
-    
+    print(str(run) + '/' + str(total_runs))
+
     print(df)
     plt.hist(df[args.col])
 

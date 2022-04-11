@@ -130,20 +130,24 @@ if __name__ == '__main__':
             'voltage','output','error']
 
     run = 0
+    total_runs = args.num_runs * len(temp_steps) * len(time_steps) * len(cmv_steps)
     for i in range(args.num_runs):
         amp = Amp.new(amp_settings, args.cal)
-        for t in time_steps:
-            amp.time = t
-            for cmv in cmv_steps:
-                run += 1
-                if run % 10 == 0:
-                    print('.')
-                amp.cmv = cmv
-                for v in vsteps:
-                    out = amp.output(v)
-                    err = (v - out/amp_settings['gain']) * 1000 # error is in mV
-                    data = [run, amp.gain, amp.offset, amp.cmrr, amp.gain_drift_temp, amp.gain_drift_time, amp.offset_drift_temp, amp.offset_drift_time, amp.cmv, amp.temperature, t, v, out, err]
-                    df = df.append(pd.Series(data, cols), ignore_index=True)
+        for temp in temp_steps:
+            amp.temperature = temp
+            for t in time_steps:
+                amp.time = t
+                for cmv in cmv_steps:
+                    run += 1
+                    if run % 10 == 0:
+                        print(str(run) + '/' + str(total_runs))
+                    amp.cmv = cmv
+                    for v in vsteps:
+                        out = amp.output(v)
+                        err = (v - out/amp_settings['gain']) * 1000 # error is in mV
+                        data = [run, amp.gain, amp.offset, amp.cmrr, amp.gain_drift_temp, amp.gain_drift_time, amp.offset_drift_temp, amp.offset_drift_time, amp.cmv, amp.temperature, t, v, out, err]
+                        df = df.append(pd.Series(data, cols), ignore_index=True)
+    print(str(run) + '/' + str(total_runs))
     
     print(df)
     vin_to_plot = 2.0
