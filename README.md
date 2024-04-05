@@ -1,4 +1,4 @@
-* Amp+ADC+Ref Chain Production Error Spread
+# Amp+ADC+Ref Chain Production Error Spread
 
 Copyright (C) 2024 Ian Wilson of Considered Solutions Pty Ltd.
 
