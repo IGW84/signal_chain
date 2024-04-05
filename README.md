@@ -5,7 +5,7 @@ Copyright (C) 2024 Ian Wilson of Considered Solutions Pty Ltd.
 Author: Ian Wilson
 Email: i.wilson.aust@gmail.com
 
-Python CLI application that calculates the production (voltage) error spread for a signal chain of Amplifier & ADC & Reference.
+Python CLI application and helpers that calculates the production (voltage) error spread for a signal chain of Amplifier & ADC & Reference.
 
 These scripts were written for my own use and have not necessarily been fully validated. Anyone using this work does so completely at their own risk. 
 

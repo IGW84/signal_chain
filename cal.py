@@ -1,5 +1,5 @@
 #    cal.py calculates the production error spread of an amp+ADC+ref chain with different calibration methods
-#    Copyright (C) <2024>  Ian Wilson
+#    Copyright (C) <2024>  Ian Wilson i.wilson.aust@gmail.com
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
