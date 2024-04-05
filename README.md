@@ -61,6 +61,9 @@ Note: The example configurations may include a [CONTROL] section. This is deprec
 
 `python accuracy.py --help` will show the possible command line options and usage.
 
+## Cal Script
+`cal.py`  ... details TBA
+
 ## Compare Script
 'compare.py` calls `accuracy.process` on a number of different calibration scenarios and plots the comparison.
 
@@ -75,8 +78,8 @@ The factory calibration method used can be set on the command line.
 (Any references to the calibration method in the configuration file are ignored. This configuration file setting should no longer be used.)
 
 Possible calibration options are:
-`none`: no calibration is assumed
-`1point`: offset voltages are assumed to be read and stored during factory calibration. Simulation sets offsets to 0 mV.
-`2point`: gain error and offset voltages are assumed to be calibrated (at 0 volts common mode voltage only). Simulation sets gain error to 0 and offsets to 0 mV.
-`cm`: gain error and offset voltages assumed to be calibrated at multiple points across the common mode range. The correction is crude and simply increases the models CMRR value by 10 dB.
-`temperature`: gain error and offset voltages assumed to be calibrated across multiple temperatures (but this does not include any common mode effect calibration (i.e. the effect itroduced by the `cm` method is not also included.)
+- `none`: no calibration is assumed
+- `1point`: offset voltages are assumed to be read and stored during factory calibration. Simulation sets offsets to 0 mV.
+- `2point`: gain error and offset voltages are assumed to be calibrated (at 0 volts common mode voltage only). Simulation sets gain error to 0 and offsets to 0 mV.
+- `cm`: gain error and offset voltages assumed to be calibrated at multiple points across the common mode range. The correction is crude and simply increases the models CMRR value by 10 dB.
+- `temperature`: gain error and offset voltages assumed to be calibrated across multiple temperatures (but this does not include any common mode effect calibration (i.e. the effect itroduced by the `cm` method is not also included.)
