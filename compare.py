@@ -89,7 +89,7 @@ if __name__ == '__main__':
     else:
         xs = None
 
-    vin_to_plot = 2.0
+    vin_to_plot = 6.0
     for cal, df in zip(cal_list, df_list):
         df2 = df[abs(df['Input Voltage'] - vin_to_plot) < 0.001] # select but with a tolerance
         df3 = df2[df2['Cal Method'] == cal]

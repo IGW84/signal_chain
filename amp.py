@@ -27,6 +27,12 @@ class Amp:
         self.temperature = ref_temperature
         self.time = 0
         self.cmv = 0
+        # 2-point cal support as 32bit value in Q2.30 fixed point format
+        # We expect the offset to be close to zero (but can be positive or 
+        # negative). The gain factor is expected to be close to 1 - a little 
+        # less or a little more.
+        self.cal_offset = 0.0
+        self.cal_gain_factor = 1.0
     
     def __repr__(self):
         s = f'name: {self.name}\n'
